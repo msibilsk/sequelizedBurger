@@ -1,30 +1,33 @@
 var db = require("../models");
+var express = require("express");
+var router = express.Router();
 
-module.exports = function(app) {
 
-  app.get("/", function(req, res) {
+router.get("/", function(req, res) {
+    console.log("TRYING TO GET");
+    db.Burger.findAll().then(function(dbPost) {
+        var hbsObject = {
+            burgers: dbPost
+        };
+        res.render("index", hbsObject);
+    });
+});
 
-      db.Burger.findAll().then(function(dbPost) {
-          res.json(dbPost);
-      });
-  });
+router.post("/", function(req, res) {
+    db.Burger.create(req.body).then(function(dbPost) {
+        res.redirect("/");
+    });
+});
 
-  // app.post("/", function(req, res) {
-  //   db.Burger.create(req.body).then(function(dbPost) {
-  //     res.json(dbPost);
-  //   });
-  // });
+router.put("/:id", function(req, res) {
+    db.Burger.update(
+        req.body, {
+            where: {
+                id: req.params.id
+            }
+        }).then(function(dbPost) {
+        res.redirect("/");
+    });
+});
 
-  // app.put("/:id", function(req, res) {
-  //   db.Burger.update(
-  //     req.body,
-  //     {
-  //       where: {
-  //         id: req.body.id
-  //       }
-  //     }).then(function(dbPost) {
-  //       res.json(dbPost);
-  //     });
-  // });
-
-};
+module.exports = router;
